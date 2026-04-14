@@ -106,19 +106,31 @@ def cartesian_to_keplerian(r_0,v_0,mu):
     h=orbital_state(r_0,v_0,mu)[0]
     e=orbital_state(r_0,v_0,mu)[2]
     i=np.rad2deg(np.arccos(h.z/h.norm()))
+    print(i)
     Z=vettore(0,0,1)
     N=Z.cross(h)
-    Omega=np.rad2deg(np.arccos(N.x/N.norm()))
-    if N.y<0:
-       Omega=360-Omega
-    omega=np.rad2deg(np.arccos(N.dot(e)/N.norm()/e.norm()))
-    if e.z<0:
-        omega=360-omega
-    theta=np.rad2deg(np.arccos(r_0.dot(e)/r_0.norm()/e.norm()))
-    v_r=r_0.dot(v_0)/r_0.norm()
-    if v_r<0:
-        theta=360-theta
-    return h,e,i,Omega,omega,theta   
+    if N.norm() < 1e-3:
+        Omega = 0
+    else:
+        Omega=np.rad2deg(np.arccos(N.x/N.norm()))
+        if N.y<0:
+            Omega=360-Omega
+            
+    print(e.norm())
+    if e.norm()< 1e-3:
+        omega = 0
+    else:
+        omega=np.rad2deg(np.arccos(N.dot(e)/N.norm()/e.norm()))
+        if e.z<0:
+            omega=360-omega
+    if e.norm() < 1e-5:
+        theta = 0
+    else:
+        theta = np.rad2deg(np.arccos(r_0.dot(e)/r_0.norm()/e.norm()))
+        v_r = r_0.dot(v_0)/r_0.norm()
+        if v_r < 0:
+            theta = 360-theta  
+        return h,e,i,Omega,omega,theta
 def R1(phi):
         phi=np.deg2rad(phi)
         R1=np.array([[1,0,0],[0,np.cos(phi),-np.sin(phi)],[0,np.sin(phi),np.cos(phi)]])
@@ -190,8 +202,8 @@ def animate_orbit():
     plt.show()
     return 
 if __name__ == "__main__":
-    r_0 = vettore(-6045, -3490, 2500)
-    v_0 = vettore(-3.457, 6.618, 2.533)
+    r_0 = vettore(7000, 0, 0)
+    v_0 = vettore(0,-7.546,0)
     mu = 398600
     risultati = cartesian_to_keplerian(r_0, v_0, mu)
     xs,ys,zs=[],[],[]
